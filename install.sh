@@ -34,13 +34,13 @@ BANNER="${CYAN}${BOLD}
 ${NC}"
 
 echo -e "$BANNER"
-echo -e "${BOLD}Универсальный установщик Tasnet Connect для Linux${NC}\n"
+echo -e "${BOLD}Tasnet Connect — Universal Linux Installer${NC}\n"
 
 # 1. Check architecture
 ARCH="$(uname -m)"
 if [ "$ARCH" != "x86_64" ] && [ "$ARCH" != "amd64" ]; then
-  echo -e "${YELLOW}[!] Предупреждение: Текущая архитектура — ${ARCH}.${NC}"
-  echo -e "    Сборки Tasnet Connect оптимизированы для 64-битных систем (x86_64)."
+  echo -e "${YELLOW}[!] Warning: Detected architecture is ${ARCH}.${NC}"
+  echo -e "    Tasnet Connect builds are optimized for 64-bit systems (x86_64).\n"
 fi
 
 # 2. Determine root / sudo elevation
@@ -49,7 +49,7 @@ if [ "$(id -u)" -ne 0 ]; then
   if command -v sudo >/dev/null 2>&1; then
     SUDO="sudo"
   else
-    echo -e "${RED}[✗] Ошибка: Для установки требуются права суперпользователя (root или sudo).${NC}"
+    echo -e "${RED}[✗] Error: Superuser privileges (root or sudo) are required for installation.${NC}"
     exit 1
   fi
 fi
@@ -63,7 +63,7 @@ fetch() {
   elif command -v wget >/dev/null 2>&1; then
     wget -q --show-progress -O "$dest" "$url"
   else
-    echo -e "${RED}[✗] Ошибка: Не найден curl или wget для загрузки файлов.${NC}"
+    echo -e "${RED}[✗] Error: Neither curl nor wget was found. Please install curl or wget.${NC}"
     exit 1
   fi
 }
@@ -79,83 +79,82 @@ RELEASE_BASE="https://github.com/tasnet20/connect-releases/releases/latest/downl
 # 4. Detect package manager and install
 if command -v apt-get >/dev/null 2>&1; then
   # ---------------- Debian / Ubuntu family ----------------
-  echo -e "${CYAN}[i] Обнаружена система на базе Debian / Ubuntu (apt)${NC}"
+  echo -e "${CYAN}[i] Detected Debian / Ubuntu based system (apt)${NC}"
   DEB_FILE="$TMP_DIR/Tasnet.Connect.deb"
 
-  echo -e "${GRAY}--> Загрузка последнего DEB пакета...${NC}"
+  echo -e "${GRAY}--> Downloading latest DEB package...${NC}"
   fetch "$RELEASE_BASE/Tasnet.Connect.deb" "$DEB_FILE"
 
-  echo -e "${GRAY}--> Установка пакета tasnet-connect...${NC}"
+  echo -e "${GRAY}--> Installing tasnet-connect package...${NC}"
   if $SUDO apt-get install -y "$DEB_FILE"; then
-    echo -e "${GREEN}[✓] Tasnet Connect успешно установлен через apt!${NC}"
+    echo -e "${GREEN}[✓] Tasnet Connect successfully installed via apt!${NC}"
   else
-    echo -e "${YELLOW}[!] Прямая установка apt потребовала исправления зависимостей, выполняем dpkg + fix...${NC}"
+    echo -e "${YELLOW}[!] Direct apt installation requested dependency resolution, running dpkg + fix...${NC}"
     $SUDO dpkg -i "$DEB_FILE" || true
     $SUDO apt-get install -f -y
-    echo -e "${GREEN}[✓] Tasnet Connect успешно установлен!${NC}"
+    echo -e "${GREEN}[✓] Tasnet Connect successfully installed!${NC}"
   fi
 
 elif command -v dnf >/dev/null 2>&1; then
   # ---------------- Fedora / RHEL / Alma / Rocky ----------------
-  echo -e "${CYAN}[i] Обнаружена система на базе Fedora / RHEL (dnf)${NC}"
+  echo -e "${CYAN}[i] Detected Fedora / RHEL based system (dnf)${NC}"
   RPM_FILE="$TMP_DIR/Tasnet.Connect.rpm"
 
-  echo -e "${GRAY}--> Загрузка последнего RPM пакета...${NC}"
+  echo -e "${GRAY}--> Downloading latest RPM package...${NC}"
   fetch "$RELEASE_BASE/Tasnet.Connect.rpm" "$RPM_FILE"
 
-  echo -e "${GRAY}--> Установка пакета tasnet-connect...${NC}"
+  echo -e "${GRAY}--> Installing tasnet-connect package...${NC}"
   $SUDO dnf install -y "$RPM_FILE"
-  echo -e "${GREEN}[✓] Tasnet Connect успешно установлен через dnf!${NC}"
+  echo -e "${GREEN}[✓] Tasnet Connect successfully installed via dnf!${NC}"
 
 elif command -v zypper >/dev/null 2>&1; then
   # ---------------- openSUSE ----------------
-  echo -e "${CYAN}[i] Обнаружена система openSUSE (zypper)${NC}"
+  echo -e "${CYAN}[i] Detected openSUSE system (zypper)${NC}"
   RPM_FILE="$TMP_DIR/Tasnet.Connect.rpm"
 
-  echo -e "${GRAY}--> Загрузка последнего RPM пакета...${NC}"
+  echo -e "${GRAY}--> Downloading latest RPM package...${NC}"
   fetch "$RELEASE_BASE/Tasnet.Connect.rpm" "$RPM_FILE"
 
-  echo -e "${GRAY}--> Установка пакета tasnet-connect...${NC}"
+  echo -e "${GRAY}--> Installing tasnet-connect package...${NC}"
   $SUDO zypper --non-interactive install "$RPM_FILE"
-  echo -e "${GREEN}[✓] Tasnet Connect успешно установлен через zypper!${NC}"
+  echo -e "${GREEN}[✓] Tasnet Connect successfully installed via zypper!${NC}"
 
 elif command -v yum >/dev/null 2>&1; then
   # ---------------- Older RHEL / CentOS ----------------
-  echo -e "${CYAN}[i] Обнаружена система на базе RHEL / CentOS (yum)${NC}"
+  echo -e "${CYAN}[i] Detected RHEL / CentOS based system (yum)${NC}"
   RPM_FILE="$TMP_DIR/Tasnet.Connect.rpm"
 
-  echo -e "${GRAY}--> Загрузка последнего RPM пакета...${NC}"
+  echo -e "${GRAY}--> Downloading latest RPM package...${NC}"
   fetch "$RELEASE_BASE/Tasnet.Connect.rpm" "$RPM_FILE"
 
-  echo -e "${GRAY}--> Установка пакета tasnet-connect...${NC}"
+  echo -e "${GRAY}--> Installing tasnet-connect package...${NC}"
   $SUDO yum localinstall -y "$RPM_FILE"
-  echo -e "${GREEN}[✓] Tasnet Connect успешно установлен через yum!${NC}"
+  echo -e "${GREEN}[✓] Tasnet Connect successfully installed via yum!${NC}"
 
 else
   # ---------------- Fallback: Portable AppImage (Arch, Manjaro, Alpine, etc.) ----------------
-  echo -e "${CYAN}[i] Дистрибутивный пакетный менеджер не определен. Устанавливаем универсальный AppImage...${NC}"
+  echo -e "${CYAN}[i] Standard package manager not detected. Installing portable AppImage...${NC}"
   TARGET_BIN="/usr/local/bin/tasnet-connect"
   DESKTOP_DIR="/usr/share/applications"
   ICON_DIR="/usr/share/icons/hicolor/512x512/apps"
 
   APPIMAGE_TMP="$TMP_DIR/Tasnet.Connect.AppImage"
-  echo -e "${GRAY}--> Загрузка универсального AppImage...${NC}"
+  echo -e "${GRAY}--> Downloading universal AppImage...${NC}"
   fetch "$RELEASE_BASE/Tasnet.Connect.AppImage" "$APPIMAGE_TMP"
 
-  echo -e "${GRAY}--> Копирование в $TARGET_BIN...${NC}"
+  echo -e "${GRAY}--> Installing to $TARGET_BIN...${NC}"
   $SUDO cp -f "$APPIMAGE_TMP" "$TARGET_BIN"
   $SUDO chmod +x "$TARGET_BIN"
 
   # Integration into application menu
   if [ -d "$DESKTOP_DIR" ]; then
-    echo -e "${GRAY}--> Создание ярлыка рабочего стола и меню приложений...${NC}"
+    echo -e "${GRAY}--> Creating desktop shortcut and application menu entry...${NC}"
     $SUDO mkdir -p "$ICON_DIR"
     
-    # Extract desktop file and icon from AppImage or generate entry
     $SUDO bash -c "cat > $DESKTOP_DIR/tasnet-connect.desktop" <<'EOF'
 [Desktop Entry]
 Name=Tasnet Connect
-Comment=Автоматический конфигуратор зон Wi-Fi HotSpot для MikroTik RouterOS
+Comment=Automated MikroTik RouterOS HotSpot Configurator
 Exec=/usr/local/bin/tasnet-connect %U
 Icon=tasnet-connect
 Terminal=false
@@ -169,12 +168,12 @@ EOF
     fi
   fi
 
-  echo -e "${GREEN}[✓] Tasnet Connect успешно установлен в $TARGET_BIN!${NC}"
+  echo -e "${GREEN}[✓] Tasnet Connect successfully installed to $TARGET_BIN!${NC}"
 fi
 
 # 5. Finished
 echo ""
-echo -e "${GREEN}${BOLD}Готово! Приложение Tasnet Connect успешно установлено.${NC}"
-echo -e "Вы можете запустить его:"
-echo -e "  1. Из главного меню приложений (раздел «Сеть» / «Инструменты»)."
-echo -e "  2. Или выполнив в терминале: ${CYAN}tasnet-connect${NC}\n"
+echo -e "${GREEN}${BOLD}Done! Tasnet Connect has been successfully installed.${NC}"
+echo -e "You can launch it:"
+echo -e "  1. From your applications menu (Network / Utilities)."
+echo -e "  2. Or by running in terminal: ${CYAN}tasnet-connect${NC}\n"
